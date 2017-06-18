@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>form Try</title>
+  </head>
+  <body>
+    <input type="text" name="name" value="" id="inputtext" ><br>
+    <button type="button" name="button" onclick="loadDoc()">CLICK ME</button><br>
+    <h2 id="resulttext"></h2>
+    <div class="" id="mybody">
+
+    </div>
+  </body>
+  <script type="text/javascript">
+    function loadDoc(){
+      var requestStrings=new Array();
+      var currRequest='';
+
+      var baseurl="http://localhost:8888/translator.php/kannada/malayalam/";
+      var res=document.getElementById("resulttext");
+      res.innerHTML="";
+      //res.style.font="20px kannada sangam MN,serif";
+      var inputVals = document.getElementById("inputtext").value;
+      var words = inputVals.split(" ");
+
+      for (var i = 0; i < words.length; i++) {
+
+        var currentWord = words[i];
+        currRequest='';
+
+        for (var j = 0; j < currentWord.length; j++) {
+
+          currRequest+=currentWord.charCodeAt(j).toString(16);
+
+        }
+
+        requestStrings.push(currRequest);
+
+      }
+
+
+      // now since we have the set of requests we will do a AJAX Request for all
+      var finalurl=baseurl+requestStrings.shift();
+      var xhp = new XMLHttpRequest();
+      xhp.onreadystatechange=function(){
+              if (xhp.readyState == 4 && xhp.status == 200) {
+                // once the AJAX Request is done we add it to the vlaue of resulttext
+
+                var resJSON=xhp.responseText;
+                console.log(resJSON);
+                var resArray=JSON.parse(resJSON);
+
+                for (var i = 0; i < resArray.length; i++) {
+                  res.innerHTML+=String.fromCharCode(parseInt(resArray[i],16));
+
+                }
+                res.innerHTML+=" ";
+
+                if(requestStrings.length!=0){
+                  finalurl=baseurl+requestStrings.shift();
+                  xhp.open("GET",finalurl,true);
+                  xhp.send();
+                }
+        }
+      };
+      xhp.open("GET",finalurl,true);
+      xhp.send();
+
+
+    }
+  </script>
+
+</html>
